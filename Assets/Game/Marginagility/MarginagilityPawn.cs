@@ -8,14 +8,18 @@ namespace Marginagility {
     [DefaultExecutionOrder(0)]
     public class MarginagilityPawn : Pawn {
         Vector2 _moveInput = Vector2.zero;
-        Vector2 _lookInput = Vector2.zero;
         [SerializeField]float _speed = 3f;
         [SerializeField]float _direction = 1f;
 
+        [SerializeField] Transform _lanceHitboxTransform;
         [SerializeField] Transform _lanceTransform;
+        [SerializeField] Transform _lanceSpriteTransform;
+        [SerializeField] Transform _rabbitSpriteTransform;
+        [SerializeField] Transform _arrowSpriteTransform;
 
         [SerializeField]int _lane;
         [SerializeField]bool _hasLance = true;
+        [SerializeField]bool _canDisarm = false;
         [SerializeField]int _lanceLane;
 
         [SerializeField]bool _isRiding = false;
@@ -24,14 +28,34 @@ namespace Marginagility {
         [SerializeField] SpriteRenderer _frogSprite;
         [SerializeField] SpriteRenderer _rabbitSprite;
         [SerializeField] SpriteRenderer _lanceSprite;
+        [SerializeField] SpriteRenderer _arrowSprite;
 
-        [SerializeField] int _score;
+        bool _scoreInitialized = false;
+
+        float _respawnTimer = 5.0f;
+
+        [SerializeField] GameObject _rabbitPrefab;
+        [SerializeField] GameObject _lancePrefab;
 
         void Start() {
-            _score = 0;
+            _scoreInitialized = false;
+            Despawn();
         }
         
         void Update() {
+            if (FindAnyObjectByType<MarginagilityGameManager>().isGameOver()) return;
+
+            if (!_scoreInitialized) {
+                FindAnyObjectByType<ScoreDisplay>().SetScore(playerIndex, 0, true);
+                _scoreInitialized = true;
+            }
+
+            if (playerIndex == -1) {
+                Destroy(this.gameObject);
+            }
+
+            transform.localScale = new Vector3(_direction, 1.0f, 1.0f);
+            
             if (_isRiding) {
                 JoustUpdate();
             } else if (_canRespawn) {
@@ -39,6 +63,7 @@ namespace Marginagility {
             } else {
                 RespawnUpdate();
             }
+
         }
 
         void JoustUpdate() {
@@ -58,36 +83,78 @@ namespace Marginagility {
                 _lane = 0;
             }
 
-            if (_lookInput.x > 0) {
-                _lanceLane = 1;
-            } else if (_lookInput.x < 0) {
-                _lanceLane = 0;
+            if (_hasLance) {
+                if (_lane == _lanceLane) {
+                    _lanceTransform.localPosition = new Vector3(2.25f, 0.5f, 1.0f);
+                    _lanceTransform.localRotation = Quaternion.Euler(0.0f, 0.0f, 0.0f);
+
+                    _lanceHitboxTransform.localPosition = new Vector3(2.5f, 0.0f, 0.0f);
+                    _lanceHitboxTransform.localScale = new Vector3(3.0f, 1.0f, 1.0f);
+                } else if (_lane > _lanceLane) {
+                    _lanceTransform.localPosition = new Vector3(1.6f, -1.1f, 1.0f);
+                    _lanceTransform.localRotation = Quaternion.Euler(0.0f, 0.0f, -45.0f);
+
+                    _lanceHitboxTransform.localPosition = new Vector3(3.0f, -3.0f, 0.0f);
+                    _lanceHitboxTransform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+                } else if (_lane < _lanceLane) {
+                    _lanceTransform.localPosition = new Vector3(1.6f, 1.9f, 1.0f);
+                    _lanceTransform.localRotation = Quaternion.Euler(0.0f, 0.0f, 45.0f);
+
+                    _lanceHitboxTransform.localPosition = new Vector3(3.0f, 3.0f, 0.0f);
+                    _lanceHitboxTransform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+                }
             }
 
-            if (_lane == _lanceLane) {
-                _lanceTransform.localPosition = new Vector3(2.25f * _direction, 0.5f, 1.0f);
-                _lanceTransform.localRotation = Quaternion.Euler(0.0f, 0.0f, 0.0f);
-            } else if (_lane > _lanceLane) {
-                _lanceTransform.localPosition = new Vector3(1.6f * _direction, -1.1f, 1.0f);
-                _lanceTransform.localRotation = Quaternion.Euler(0.0f, 0.0f, -45.0f * _direction);
-            } else if (_lane < _lanceLane) {
-                _lanceTransform.localPosition = new Vector3(1.6f * _direction, 1.9f, 1.0f);
-                _lanceTransform.localRotation = Quaternion.Euler(0.0f, 0.0f, 45.0f * _direction);
-            }
         }
 
         void SpawnSelectUpdate() {
 
             if (_moveInput.y > 0) {
                 _lane = 1;
+
             } else if (_moveInput.y < 0) {
                 _lane = 0;
             }
 
             if (_moveInput.x > 0) {
-                _direction = -1f;
+                _direction = -1.0f;
             } else if (_moveInput.x < 0) {
-                _direction = 1f;
+                _direction = 1.0f;
+            }
+
+            Vector3 pos = Vector3.zero;
+            pos.x = _direction == 1.0f ? -7.5f : 7.5f;
+            pos.y = _lane == 1 ? 2 : -1;
+            transform.position = pos;
+
+
+            _respawnTimer -= Time.deltaTime;
+            FindAnyObjectByType<ScoreDisplay>().SetRespawn(playerIndex, _respawnTimer);
+            if (_respawnTimer <= 0.0f) {
+                Respawn();
+            }
+
+            switch (playerIndex)
+            {
+                case 0:
+                    _arrowSpriteTransform.localPosition = new Vector3(-0.5f * _direction, 0.0f, 0.0f);
+                    _arrowSpriteTransform.localScale = new Vector3(1.0f * _direction, 1.0f, 1.0f);
+                    break;
+                case 1:
+                    _arrowSpriteTransform.localPosition = new Vector3(0.5f * _direction, 0.0f, 0.0f);
+                    _arrowSpriteTransform.localScale = new Vector3(-1.0f * _direction, 1.0f, 1.0f);
+                    break;
+                case 2:
+                    _arrowSpriteTransform.localPosition = new Vector3(0.0f, 0.5f, 0.0f);
+                    _arrowSpriteTransform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+                    break;
+                case 3:
+                    _arrowSpriteTransform.localPosition = new Vector3(0.0f, -0.5f, 0.0f);
+                    _arrowSpriteTransform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+                    break;
+
+                default:
+                    break;
             }
         }
 
@@ -99,7 +166,6 @@ namespace Marginagility {
                 Despawn();
                 return;
             }
-
         }
 
         void Despawn() {
@@ -109,6 +175,10 @@ namespace Marginagility {
             _frogSprite.enabled = false;
             _rabbitSprite.enabled = false;
             _lanceSprite.enabled = false;
+
+            _arrowSprite.enabled = true;
+
+            _respawnTimer = 5.0f;
         }
 
         void Respawn() {
@@ -120,29 +190,34 @@ namespace Marginagility {
             _rabbitSprite.enabled = true;
             _lanceSprite.enabled = true;
 
+            _arrowSprite.enabled = false;
+
             if (_lane == 1) {
                 transform.position = new Vector3(-7.5f * _direction, 2, 0);
             } else {
                 transform.position = new Vector3(-7.5f * _direction, -1, 0);
             }
+
+            _lanceLane = _lane;
+
+            FindAnyObjectByType<ScoreDisplay>().SetRespawn(playerIndex, 0.0f);
+            FindAnyObjectByType<MarginagilityGameManager>().PlayRespawn();
         }
 
         protected override void OnActionPressed(InputAction.CallbackContext context) {
+            if (FindAnyObjectByType<MarginagilityGameManager>().isGameOver()) return;
+
             if (context.action.name == PawnAction.Move) {
                 _moveInput = context.ReadValue<Vector2>();
             }
 
-            if (context.action.name == PawnAction.Look) {
-                _lookInput = context.ReadValue<Vector2>();
-            }
-
             if (context.action.name == PawnAction.ButtonA) {
+                if (_hasLance) {
+                    _lanceLane = (_lanceLane + 1) % 2;
+                    _canDisarm = true;
+                }
                 if (_canRespawn) Respawn();
             }
-        }
-
-        public float GetScore() {
-            return _score;
         }
 
         public float GetDirection() {
@@ -165,14 +240,55 @@ namespace Marginagility {
             return _hasLance;
         }
 
-        public void Fall() {
-            _score -= 1;
-            _isRiding = false;
-            _hasLance = false;
+        public bool GetDisarm() {
+            return _canDisarm;
         }
 
-        public void Hit(int count) {
-            _score += 2 * count;
+        public void UnsetDisarm() {
+            _canDisarm = false;
         }
+
+        public BoxCollider2D GetLanceHitbox() {
+            return _lanceHitboxTransform.GetComponent<BoxCollider2D>();
+        }
+
+        public void Fall() {
+            FindAnyObjectByType<ScoreDisplay>().AddToScore(playerIndex, -1);
+
+            _isRiding = false;
+            FallenObject fallenRabbit = Instantiate(_rabbitPrefab, 
+                                                    _rabbitSpriteTransform.position, 
+                                                    _rabbitSpriteTransform.rotation
+                                            ).GetComponent<FallenObject>();
+            fallenRabbit.GetSprite().color = _rabbitSprite.color;
+
+            if (_hasLance) {
+                FallenObject droppedLance = Instantiate(_lancePrefab, 
+                                                    _lanceSpriteTransform.position, 
+                                                    _lanceSpriteTransform.rotation
+                                            ).GetComponent<FallenObject>();
+                droppedLance.GetSprite().color = _lanceSprite.color;
+            }
+            _hasLance = false;
+
+            _rabbitSprite.enabled = false;
+            _lanceSprite.enabled = false;
+        }
+
+        public void DropLance() {
+            _hasLance = false;
+
+            _lanceSprite.enabled = false;
+            FallenObject droppedLance = Instantiate(_lancePrefab, 
+                                                    _lanceSpriteTransform.position, 
+                                                    _lanceSpriteTransform.rotation
+                                            ).GetComponent<FallenObject>();
+            droppedLance.GetSprite().color = _lanceSprite.color;
+        }
+
+        public void Hit() {
+            FindAnyObjectByType<ScoreDisplay>().AddToScore(playerIndex, 2);
+        }
+
     }
 }

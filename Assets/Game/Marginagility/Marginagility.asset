@@ -18,11 +18,14 @@ MonoBehaviour:
     m_SceneAsset: {fileID: 102900000, guid: cabb95d2250bc7744b9c41ff07c41827, type: 3}
     m_SceneName: Marginagility
   minimumPlayers: 2
-  description: Move your lance at the right time to knock an opponent's lance away. Knock the other players off their frogs to score points.
-  controls: '<sprite name = "XBOX_LEFT_STICK"> - Change track
+  description: 'Move your lance at the right time to knock an opponent''s lance away. Knock the other players off their frogs to score points.
 
-    <sprite name = "XBOX_RIGHT_STICK"> - Aim lance
 
-    <sprite name = "XBOX_A"> - Quick Respawn'
+    Hit an enemy: +2 Points
+
+    Get hit: -1 Point'
+  controls: '<sprite name="XBOX_LEFT_STICK"> - Change Track/Select Spawn
+
+    <sprite name="XBOX_A"> - Move Lance/Quick Respawn'
   credits: Created by Ian Perry
   attributions: 
