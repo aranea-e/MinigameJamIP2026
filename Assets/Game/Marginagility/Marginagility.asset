@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Marginagility
   m_EditorClassIdentifier: Assembly-CSharp::Game.MinigameFramework.Scripts.Framework.Minigames.MinigameInfo
   minigameName: Marginagility
-  thumbnail: {fileID: 0}
+  thumbnail: {fileID: 21300000, guid: e44780a3bde5a0c4f9eca921ada811bf, type: 3}
   scene:
     m_SceneAsset: {fileID: 102900000, guid: cabb95d2250bc7744b9c41ff07c41827, type: 3}
     m_SceneName: Marginagility

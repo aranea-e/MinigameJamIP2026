@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "MiniGame2026.slnx"
+    "dotnet.defaultSolution": "Project.slnx"
 }

@@ -128,5 +128,9 @@ namespace Marginagility {
         public bool isGameOver() {
             return _gameOver;
         }
+
+        public float GetTimer() {
+            return _timer;
+        }
     }
 }
