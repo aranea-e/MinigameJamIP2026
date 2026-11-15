@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b65074faa8a836848ae4203c738fad3b, type: 3}
+  m_Name: Marginagility
+  m_EditorClassIdentifier: Assembly-CSharp::Game.MinigameFramework.Scripts.Framework.Minigames.MinigameInfo
+  minigameName: Marginagility
+  thumbnail: {fileID: 0}
+  scene:
+    m_SceneAsset: {fileID: 102900000, guid: cabb95d2250bc7744b9c41ff07c41827, type: 3}
+    m_SceneName: Marginagility
+  minimumPlayers: 2
+  description: Move your lance at the right time to knock an opponent's lance away. Knock the other players off their frogs to score points.
+  controls: '<sprite name = "XBOX_LEFT_STICK"> - Change track
+
+    <sprite name = "XBOX_RIGHT_STICK"> - Aim lance
+
+    <sprite name = "XBOX_A"> - Quick Respawn'
+  credits: Created by Ian Perry
+  attributions: 
