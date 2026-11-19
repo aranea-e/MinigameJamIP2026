@@ -17,7 +17,7 @@ MonoBehaviour:
   scene:
     m_SceneAsset: {fileID: 102900000, guid: cabb95d2250bc7744b9c41ff07c41827, type: 3}
     m_SceneName: Marginagility
-  minimumPlayers: 2
+  minimumPlayers: 1
   description: 'Move your lance at the right time to knock an opponent''s lance away. Knock the other players off their frogs to score points.
 
 
